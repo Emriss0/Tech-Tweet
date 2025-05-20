@@ -1,0 +1,179 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block main %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+      <!-- Glassmorphic Card Container -->
+      <div class="card border-0 bg-dark-800 shadow-neuro rounded-4 overflow-hidden">
+        <div class="card-header bg-gradient-purple py-4 position-relative">
+          <div class="blur-overlay"></div>
+          <h2 class="mb-0 text-center text-white fw-bold">
+            <i class="fas fa-magic me-2"></i>Craft Your Tweet
+          </h2>
+        </div>
+        
+        <div class="card-body p-4">
+          <form method="post" enctype="multipart/form-data" id="tweetForm" class="glass-form">
+            {% comment %} {% csrf_token %} {% endcomment %}
+
+            <!-- Content Input with Floating Label -->
+            <div class="form-floating mb-4">
+              {% comment %} {{ form.content }} {% endcomment %}
+              <label for="{{ form.content.id_for_label }}" class="text-light">
+                <i class="fas fa-pen me-2"></i>Share your spark...
+              </label>
+              <small class="text-muted float-end" id="charCounter">0/280</small>
+            </div>
+
+            <!-- Drag & Drop Image Upload -->
+            <div class="mb-4">
+              <label class="dnd-upload-area w-100 p-5 rounded-3 text-center position-relative">
+                <div class="upload-content">
+                  <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                  <h5 class="text-light mb-2">Drag & Drop or Click to Upload</h5>
+                  <p class="text-muted mb-0">PNG, JPG (Max 5MB)</p>
+                  {% comment %} {{ form.image }} {% endcomment %}
+                </div>
+              </label>
+              <div class="mt-3 grid" id="imagePreview"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-gradient-pink btn-lg w-100 py-3">
+              <i class="fas fa-rocket me-2"></i>Launch Tweet
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Dark Mode CSS -->
+<style>
+  :root {
+    --bg-dark: #0a0a0f;
+    --bg-dark-800: #12121a;
+    --text-light: rgba(255, 255, 255, 0.9);
+    --neural-shadow: 20px 20px 60px #0a0a0f, -20px -20px 60px #1a1a25;
+  }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text-light);
+  }
+
+  .bg-dark-800 {
+    background: var(--bg-dark-800);
+  }
+
+  .shadow-neuro {
+    box-shadow: var(--neural-shadow);
+  }
+
+  .bg-gradient-purple {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  }
+
+  .btn-gradient-pink {
+    background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-gradient-pink:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3);
+  }
+
+  .dnd-upload-area {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .dnd-upload-area:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #6366f1;
+  }
+
+  #{{ form.content.id_for_label }} {
+    height: 150px;
+    resize: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+  }
+
+  .form-control:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #6366f1;
+    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+    color: var(--text-light);
+  }
+
+  .blur-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(10px);
+    z-index: 0;
+  }
+</style>
+
+<!-- Enhanced JavaScript -->
+<script>
+  // Character Counter with Warning
+  const textarea = document.getElementById('{{ form.content.id_for_label }}');
+  const counter = document.getElementById('charCounter');
+  
+  textarea.addEventListener('input', (e) => {
+    const length = e.target.value.length;
+    counter.textContent = `${length}/280`;
+    counter.style.color = length > 250 ? 
+      (length >= 280 ? '#ef4444' : '#eab308') : '#6b7280';
+  });
+
+  // Drag & Drop Image Upload
+  const dropZone = document.querySelector('.dnd-upload-area');
+  const fileInput = document.getElementById('{{ form.image.id_for_label }}');
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = '#6366f1';
+    dropZone.style.background = 'rgba(99, 102, 241, 0.1)';
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+    dropZone.style.background = 'rgba(255, 255, 255, 0.05)';
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileInput.files = e.dataTransfer.files;
+    handleImagePreview(e.dataTransfer.files[0]);
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    handleImagePreview(e.target.files[0]);
+  });
+
+  function handleImagePreview(file) {
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
+    
+    if (file) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.classList.add('img-fluid', 'rounded-3', 'mb-2');
+      img.style.border = '2px solid rgba(255, 255, 255, 0.1)';
+      preview.appendChild(img);
+    }
+  }
+</script>
+{% endblock %}

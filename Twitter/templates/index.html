@@ -1,0 +1,187 @@
+{% load static %}
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+
+    {% comment %}-----------------------CDN & CSS Links---------------------------{% endcomment %}
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- In your base.html header -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'twitter/css/styles.css' %}">
+    
+</head>
+<body>
+    {% comment %} --------------------------Profile and Create Toggle------------------- {% endcomment %}
+
+    <div class="floating-menu">
+        <!-- Create Button with Dropdown -->
+        <div class="dropdown-container">
+            <div class="menu-button" onclick="toggleDropdown('createDropdown')">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="dropdown-menu" id="createDropdown">
+                <a href="{% url 'tweet_create' %}" class="dropdown-item">
+                    <i class="fas fa-feather"></i>
+                    Create New Tweet
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-hashtag"></i>
+                    Discover
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-rss"></i>
+                    Feed
+                </a>
+            </div>
+        </div>
+
+        <!-- Profile Button with Dropdown -->
+        <div class="dropdown-container">
+            <div class="menu-button" onclick="toggleDropdown('profileDropdown')">
+                <img src="{{ user.profile.avatar.url }}" class="user-avatar" alt="Avatar">
+                <div class="online-status"></div>
+            </div>
+            <div class="dropdown-menu" id="profileDropdown">
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}">
+                    
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </button>
+
+                </form>
+                {% else %}
+                <a href="{% url 'login' %}" class="dropdown-item">
+                    <i class="fas fa-user-astronaut"></i>
+                    Login
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-comments"></i>
+                    Support
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% comment %} ---------------------------------Navbar-------------------------- {% endcomment %}
+
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-rocket"></i>
+            <span>TechTweet</span>
+        </div>
+        <ul class="nav-items">
+            <li class="nav-item {% if request.resolver_match.url_name == 'tweet_list' %}active{% endif %}">
+                <a href="{% url 'tweet_list' %}">
+                    <div class="logo-cont"><i class="fas fa-home"></i></div>
+                    <span>Home</span>
+                </a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <a href="{% url 'profile' %}">
+                    <div class="logo-cont"><i class="fas fa-user-astronaut"></i></div>
+                    <span>Profile</span>
+                </a>
+            </li>
+            <li class="nav-item {% if request.resolver_match.url_name == 'my_tweet_list' %}active{% endif %}">
+                <a href="{% url 'my_tweet_list' %}">
+                    <div class="logo-cont"><i class="fas fa-space-shuttle"></i></div>
+                    <span>My Tweets</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#">
+                    <div class="logo-cont"><i class="fas fa-comments"></i></div>
+                    <span>Contact</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'admin:index' %}">
+                    <div class="logo-cont"><i class="fas fa-cog"></i></div>
+                    <span>Admin</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="nav-item {% if request.resolver_match.url_name == 'login' %}active{% endif %}">
+                <a href="{% url 'login' %}">
+                    <div class="logo-cont"><i class="fas fa-user-astronaut"></i></div>
+                    <span>Login</span>
+                </a>
+            </li>
+            <li class="nav-item {% if request.resolver_match.url_name == 'register' %}active{% endif %}">
+                <a href="{% url 'register' %}">
+                    <div class="logo-cont"><i class="fas fa-space-shuttle"></i></div>
+                    <span>Sign Up</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        
+        {% block banner %}{% endblock %}
+        {% block main %}{% endblock  %}
+        {% block information %}{% endblock %}
+    </main>
+        
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 class="footer-title">Galactic Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-rocket"></i>Launch Portal</a></li>
+                        <li><a href="#"><i class="fas fa-satellite"></i>Orbit Control</a></li>
+                        <li><a href="#"><i class="fas fa-user-astronaut"></i>Crew Hub</a></li>
+                    </ul>
+                </div>
+    
+                <div class="footer-section">
+                    <h3 class="footer-title">Stellar Contact</h3>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-comments"></i>Support Beam</a></li>
+                        <li><a href="#"><i class="fas fa-broadcast-tower"></i>Transmission: 142.55MHz</a></li>
+                        <li><a href="#"><i class="fas fa-map-marked-alt"></i>Orbital Station 5</a></li>
+                    </ul>
+                </div>
+    
+                <div class="footer-section">
+                    <h3 class="footer-title">Cosmic Network</h3>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fas fa-meteor"></i></a>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="footer-bottom">
+                <p>© 2025 TechTweet All Rights Reserved • Vipul Chaurasia • Made with Curiosity</p>
+            </div>
+        </footer>
+
+    {% comment %}---------------------------JS---------------------------{% endcomment %}
+    <script src="{% static 'twitter/js/myscript.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+</body>
+</html>

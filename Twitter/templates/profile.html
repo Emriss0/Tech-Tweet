@@ -1,0 +1,62 @@
+{% extends "index.html" %}
+
+{% load static %}
+
+{% block title %}Profile{% endblock  %}
+
+{% block main %}
+<link rel="stylesheet" href="{% static 'twitter/css/profileStyles.css' %}">
+<div class="profile-container">
+    <h1 class="subscription-header">Profile</h1>
+    
+    <div class="profile-header">
+        <img src="{{ profile.avatar.url }}" class="avatar" alt="Profile Picture">
+        <div class="profile-info">
+            <div class="d-flex align-items-center justify-content-between">
+                <h1>{{ profile.first_name }} {{ profile.last_name }}</h1> &nbsp; &nbsp; &nbsp;
+                <a href="{% url 'update_profile' %}" class="social-icon custom-tooltip" data-tooltip="Edit Profile" style="padding-top: 0;">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+            </div>
+            <p>@{{ user.username }}
+            </p>
+        </div>
+    </div>
+
+    <div class="bio-section" style="margin-top: 2rem;">
+        <hr class="mt-4 mb-4">
+        <h3>About Me</h3>
+        {% if profile.about %}
+            <p>{{ profile.about }}</p>
+        {% else %}
+            <p>No bio available.</p>
+        {% endif %}
+        <hr class="mt-4 mb-4">
+        <div class="form-group">
+            <label class="floating-label custom-tooltip" data-tooltip="City">City:
+            {{ profile.city }}</label>
+        </div>
+        <div class="form-group">
+            <label class="floating-label custom-tooltip" data-tooltip="State">State:
+            {{ profile.state }}</label>
+        </div>
+        <div class="form-group">
+            <label class="floating-label custom-tooltip" data-tooltip="Country">Country:
+            {{ profile.country }}</label>
+        </div>
+        <hr class="mt-4 mb-4">
+        <div class="form-group">
+            <label class="floating-label custom-tooltip" data-tooltip="Email">Email:
+            {{ user.email }}</label>
+        </div>
+        <div class="form-group">
+            <label class="floating-label custom-tooltip" data-tooltip="Mobile">Mobile:
+            {{ profile.mobile }}</label>
+        </div>
+        <div class="form-group">
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'twitter/js/profileScripts.js' %}"></script>
+{% endblock %}
